@@ -7,6 +7,38 @@ d3.json(url).then(function (data) {
   createFeatures(data.features);
 });
 
+
+// magnitude by size
+function markerSize(item) {
+    return item.properties.mag;
+}
+
+// depth by color
+function markercolor(item) {
+    return item.geometry.coordinates[2];
+}
+
+
+
+for (let i = 0; i < cities.length; i++) {
+    L.circle(cities[i].location, {
+      fillOpacity: 0.75,
+      color: "white",
+      fillColor: "purple",
+      // Setting our circle's radius to equal the output of our markerSize() function:
+      // This will make our marker's size proportionate to its population.
+      radius: markerSize(cities[i].population)
+    }).bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`).addTo(myMap);
+  }
+
+  
+//add cholorpleth
+//add legend
+
+
+
+// from earthquake activity file:
+
 function createFeatures(earthquakeData) {
 
   // Define a function that we want to run once for each feature in the features array.
