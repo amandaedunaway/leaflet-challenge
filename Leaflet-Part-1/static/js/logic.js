@@ -1,98 +1,97 @@
+let myMap = L.map("map", {
+    center: [40.7, -94.5
+],
+zoom: 5,
+}
+);
+
+// Create the tile layer
+let baseMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+
+  // Add the tile layer to the map
+baseMap.addTo(myMap);
+
+
 // Store our API endpoint as queryUrl.
 let url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 // Perform a GET request to the query URL/
 d3.json(url).then(function (data) {
+    console.log(data);
   // Once we get a response, send the data.features object to the createFeatures function.
   createFeatures(data.features);
 });
 
+function customCircle(data){
+
+    console.log("hello");
+    return {
+        color: "#95fc05",
+        fillcolor: markerColor(data.geometry.coordinates[2]),
+        radius: markerSize(data.properties.mag),
+        opacity: 1
+    };
+
+}
+
+function createFeatures(data) {
+    L.geoJSON(data, {
+        
+        poinToLayer: function(feature, latlng){
+            return L.circleMarker(latlng);
+        },
+        style: customCircle
+    
+    }).addTo(myMap);
+}
+
 
 // magnitude by size
 function markerSize(item) {
-    return item.properties.mag;
+    //return item.properties.mag;
+    if (item  ===  0) {
+        return 1
+    }
+    return item * 5;
 }
 
 // depth by color
-function markercolor(item) {
-    return item.geometry.coordinates[2];
+function markerColor(item) {
+    //return item.geometry.coordinates[2];
+    if (item >= 90) {
+        return "#eb1a47";
+    }
+    else if (item >= 70) {
+        return "#eb751a";
+    }
+    else {
+        return "#95fc05";
+    }
 }
 
 
 
-for (let i = 0; i < cities.length; i++) {
-    L.circle(cities[i].location, {
-      fillOpacity: 0.75,
-      color: "white",
-      fillColor: "purple",
-      // Setting our circle's radius to equal the output of our markerSize() function:
-      // This will make our marker's size proportionate to its population.
-      radius: markerSize(cities[i].population)
-    }).bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`).addTo(myMap);
-  }
+// incomplete for loop that adds circles and popup
+// for (let i = 0; i < cities.length; i++) {
+//     L.circle(cities[i].location, {
+//       fillOpacity: 0.75,
+//       color: "white",
+//       fillColor: "purple", // color will be markerColor, on a gradient as specified below
+//       // Setting our circle's radius to equal the output of our markerSize() function:
+      
+//       radius: markerSize()
+//     }).bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`).addTo(myMap);
+//   }
 
   
 //add cholorpleth
+// L.choropleth()
+// scale: ["#95fc05","#eb1a47"],
+
+
 //add legend
 
 
 
-// from earthquake activity file:
-
-function createFeatures(earthquakeData) {
-
-  // Define a function that we want to run once for each feature in the features array.
-  // Give each feature a popup that describes the place and time of the earthquake.
-  function onEachFeature(feature, layer) {
-    layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
-  }
-
-  // Create a GeoJSON layer that contains the features array on the earthquakeData object.
-  // Run the onEachFeature function once for each piece of data in the array.
-  let earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature
-  });
-
-  // Send our earthquakes layer to the createMap function/
-  createMap(earthquakes);
-}
-
-function createMap(earthquakes) {
-
-  // Create the base layers.
-  let street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  })
-
-  let topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-  });
-
-  // Create a baseMaps object.
-  let baseMaps = {
-    "Street Map": street,
-    "Topographic Map": topo
-  };
-
-  // Create an overlay object to hold our overlay.
-  let overlayMaps = {
-    Earthquakes: earthquakes
-  };
-
-  // Create our map, giving it the streetmap and earthquakes layers to display on load.
-  let myMap = L.map("map", {
-    center: [
-      37.09, -95.71
-    ],
-    zoom: 5,
-    layers: [street, earthquakes]
-  });
-
-  // Create a layer control.
-  // Pass it our baseMaps and overlayMaps.
-  // Add the layer control to the map.
-  L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
-  }).addTo(myMap);
-
-}
