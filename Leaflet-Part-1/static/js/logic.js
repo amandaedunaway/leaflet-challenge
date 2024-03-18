@@ -5,6 +5,7 @@ zoom: 5,
 }
 );
 
+
 // Create the tile layer
 let baseMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -31,7 +32,10 @@ function customCircle(data){
         color: "#95fc05",
         fillcolor: markerColor(data.geometry.coordinates[2]),
         radius: markerSize(data.properties.mag),
-        opacity: 1
+        opacity: 1,
+        fillOpacity: 1,
+        stroke: true,
+        weight: 0.5
     };
 
 }
@@ -39,11 +43,21 @@ function customCircle(data){
 function createFeatures(data) {
     L.geoJSON(data, {
         
-        poinToLayer: function(feature, latlng){
+        pointToLayer: function(feature, latlng){
             return L.circleMarker(latlng);
+            //.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
+        
         },
-        style: customCircle
-    
+        style: customCircle,
+        
+        onEachFeature: function(feature, latlng){
+            latlng.bindPopup(
+                `Magnitude: `+feature.properties.mag
+                +`<br>Depth: `+feature.geometry.coordinates[2]
+                +`<br>Location: `+feature.properties.place
+            );
+        }
+
     }).addTo(myMap);
 }
 
@@ -61,37 +75,40 @@ function markerSize(item) {
 function markerColor(item) {
     //return item.geometry.coordinates[2];
     if (item >= 90) {
-        return "#eb1a47";
+        return "#FF5F65";
     }
     else if (item >= 70) {
-        return "#eb751a";
+        return "#FCA35D";
+    }
+    else if (item >= 50) {
+        return "#FDB72A";
+    }
+    else if (item >= 30) {
+        return "#F7DB11";
+    }
+    else if (item >= 10) {
+        return "#FDB72A";
     }
     else {
-        return "#95fc05";
+        return "#A3F600";
     }
 }
 
-
-
-// incomplete for loop that adds circles and popup
-// for (let i = 0; i < cities.length; i++) {
-//     L.circle(cities[i].location, {
-//       fillOpacity: 0.75,
-//       color: "white",
-//       fillColor: "purple", // color will be markerColor, on a gradient as specified below
-//       // Setting our circle's radius to equal the output of our markerSize() function:
-      
-//       radius: markerSize()
-//     }).bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`).addTo(myMap);
-//   }
-
-  
-//add cholorpleth
-// L.choropleth()
-// scale: ["#95fc05","#eb1a47"],
-
-
 //add legend
+let legend = L.control({position: "bottomright"});
 
+legend.onAdd = function() {
+    let div = L.DomUtil.create("div", "info legend");
+    let colors = ["#FF5F65","#FCA35D","#FDB72A"];
+    let labels = [-10,10,30,50];
+
+    for (let i = 0; i < labels.length; i++) {
+        div.innerHTML += "<i style='background: " + colors[i] + "'></i> "
+          + lables[i] + (labels[i + 1] ? "&ndash;" + labels[i + 1] + "<br>" : "+");
+      }
+      return div;
+    };
+
+legend.addTo(myMap);
 
 
