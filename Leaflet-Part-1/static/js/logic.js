@@ -94,21 +94,22 @@ function markerColor(item) {
     }
 }
 
+
+
 //add legend
 let legend = L.control({position: "bottomright"});
 
 legend.onAdd = function() {
     let div = L.DomUtil.create("div", "info legend");
-    let colors = ["#FF5F65","#FCA35D","#FDB72A"];
-    let labels = [-10,10,30,50];
+    let colors = ["#A3F600", "#FDB72A", "#F7DB11", "#FDB72A", "#FCA35D", "#FF5F65"];
+    let labels = [-10, 10, 30, 50, 70, 90];
 
     for (let i = 0; i < labels.length; i++) {
-        div.innerHTML += "<i style='background: " + colors[i] + "'></i> "
-          + lables[i] + (labels[i + 1] ? "&ndash;" + labels[i + 1] + "<br>" : "+");
-      }
-      return div;
-    };
+        // Create HTML content for each legend item
+        div.innerHTML += "<div><i style='background: " + colors[i] + "'></i> "
+          + "<span>" + labels[i] + (labels[i + 1] ? "&ndash;" + labels[i + 1] + "<br>" : "+") + "</span></div>";
+    }
+    return div;
+};
 
 legend.addTo(myMap);
-
-
