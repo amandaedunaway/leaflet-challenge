@@ -27,28 +27,25 @@ d3.json(url).then(function (data) {
 
 function customCircle(data){
 
-    console.log("hello");
     return {
-        color: "#95fc05",
-        fillcolor: markerColor(data.geometry.coordinates[2]),
+        color: "#000000",
+        fillColor: markerColor(data.geometry.coordinates[2]),
         radius: markerSize(data.properties.mag),
         opacity: 1,
-        fillOpacity: 1,
+        fillOpacity: 0.75,
         stroke: true,
         weight: 0.5
     };
-
 }
 
 function createFeatures(data) {
     L.geoJSON(data, {
         
         pointToLayer: function(feature, latlng){
-            return L.circleMarker(latlng);
-            //.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
+            return L.circleMarker(latlng, customCircle(feature));
         
         },
-        style: customCircle,
+       
         
         onEachFeature: function(feature, latlng){
             latlng.bindPopup(
@@ -64,7 +61,7 @@ function createFeatures(data) {
 
 // magnitude by size
 function markerSize(item) {
-    //return item.properties.mag;
+    
     if (item  ===  0) {
         return 1
     }
@@ -73,23 +70,15 @@ function markerSize(item) {
 
 // depth by color
 function markerColor(item) {
-    //return item.geometry.coordinates[2];
-    if (item >= 90) {
+    if (item >= 16) {
         return "#FF5F65";
-    }
-    else if (item >= 70) {
+    } else if (item >= 12) {
         return "#FCA35D";
-    }
-    else if (item >= 50) {
-        return "#FDB72A";
-    }
-    else if (item >= 30) {
+    } else if (item >= 7) {
         return "#F7DB11";
-    }
-    else if (item >= 10) {
-        return "#FDB72A";
-    }
-    else {
+    } else if (item >= 2) {
+        return "#e8f75e";
+    } else {
         return "#A3F600";
     }
 }
@@ -101,8 +90,8 @@ let legend = L.control({position: "bottomright"});
 
 legend.onAdd = function() {
     let div = L.DomUtil.create("div", "info legend");
-    let colors = ["#A3F600", "#FDB72A", "#F7DB11", "#FDB72A", "#FCA35D", "#FF5F65"];
-    let labels = [-10, 10, 30, 50, 70, 90];
+    let colors = ["#A3F600", "#e8f75e", "#F7DB11", "#FCA35D", "#FF5F65"];
+    let labels = [-3, 2, 7, 12, 16];
 
     for (let i = 0; i < labels.length; i++) {
         // Create HTML content for each legend item
