@@ -1,3 +1,4 @@
+// Create the initial map object
 let myMap = L.map("map", {
     center: [40.7, -94.5
 ],
@@ -15,16 +16,18 @@ let baseMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 baseMap.addTo(myMap);
 
 
-// Store our API endpoint as queryUrl.
+// Store our API endpoint as the query url
 let url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-// Perform a GET request to the query URL/
+
+// Perform a GET request to the query url
 d3.json(url).then(function (data) {
     console.log(data);
   // Once we get a response, send the data.features object to the createFeatures function.
   createFeatures(data.features);
 });
 
+// Create function for circle appearance, calling markerSize and markerColor
 function customCircle(data){
 
     return {
@@ -38,6 +41,7 @@ function customCircle(data){
     };
 }
 
+// Create function to add interactive marker
 function createFeatures(data) {
     L.geoJSON(data, {
         
@@ -59,7 +63,7 @@ function createFeatures(data) {
 }
 
 
-// magnitude by size
+// Create a function to link the size to magnitude
 function markerSize(item) {
     
     if (item  ===  0) {
@@ -68,7 +72,7 @@ function markerSize(item) {
     return item * 5;
 }
 
-// depth by color
+// Create a function to link depth and color
 function markerColor(item) {
     if (item >= 16) {
         return "#FF5F65";
@@ -85,7 +89,7 @@ function markerColor(item) {
 
 
 
-//add legend
+// Create the legend and add to map
 let legend = L.control({position: "bottomright"});
 
 legend.onAdd = function() {
